@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Table List System Preview / 表格列表系统预览</title>
+    <style>
+      :root {
+        --bg-app: #f5f7fb;
+        --bg-surface: #ffffff;
+        --bg-surface-muted: #f7f8fc;
+        --bg-hover: #eef3ff;
+        --border-default: #d9e0ef;
+        --border-strong: #c6d0e5;
+        --text-primary: #162033;
+        --text-secondary: #5b6780;
+        --text-tertiary: #8b96ab;
+        --brand-primary: #315efb;
+        --brand-primary-soft: #e8eeff;
+        --success: #117a43;
+        --success-soft: #e9f7ef;
+        --warning: #b26a00;
+        --warning-soft: #fff4df;
+        --danger: #b42318;
+        --danger-soft: #fdeceb;
+        --info: #155eef;
+        --info-soft: #eaf1ff;
+        --radius-xs: 8px;
+        --radius-sm: 10px;
+        --radius-md: 14px;
+        --radius-lg: 18px;
+        --shadow-sm: 0 1px 2px rgba(18, 28, 45, 0.04);
+        --shadow-md: 0 8px 24px rgba(18, 28, 45, 0.06);
+        --space-4: 4px;
+        --space-8: 8px;
+        --space-12: 12px;
+        --space-16: 16px;
+        --space-20: 20px;
+        --space-24: 24px;
+        --space-32: 32px;
+        --font-sans: "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+        --font-size-12: 12px;
+        --font-size-13: 13px;
+        --font-size-14: 14px;
+        --font-size-16: 16px;
+        --font-size-20: 20px;
+        --font-size-28: 28px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background: linear-gradient(180deg, #eef2ff 0%, var(--bg-app) 25%);
+        color: var(--text-primary);
+      }
+
+      .page {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 40px 24px 64px;
+      }
+
+      .panel,
+      .state-card,
+      .token-card,
+      .card,
+      .list-item {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .toolbar-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .input,
+      .select,
+      .button,
+      .button-soft {
+        height: 40px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-default);
+        padding: 0 14px;
+        font: inherit;
+      }
+
+      .input,
+      .select {
+        background: #fff;
+        color: var(--text-primary);
+      }
+
+      .input {
+        min-width: 220px;
+      }
+
+      .button {
+        background: var(--brand-primary);
+        color: #fff;
+        border-color: var(--brand-primary);
+        font-weight: 600;
+      }
+
+      .button-soft {
+        background: var(--bg-surface-muted);
+        color: var(--text-primary);
+      }
+
+      .section {
+        margin-top: 120px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .section-subtitle {
+        margin-top: 6px;
+        color: var(--text-secondary);
+        font-size: var(--font-size-13);
+      }
+
+      .panel {
+        overflow: hidden;
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--border-default);
+        background: var(--bg-surface-muted);
+      }
+
+      .batch-bar {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--brand-primary-soft);
+        color: var(--brand-primary);
+        font-size: var(--font-size-12);
+        font-weight: 600;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border-default);
+        text-align: left;
+        vertical-align: middle;
+        font-size: var(--font-size-14);
+      }
+
+      th {
+        font-size: var(--font-size-12);
+        color: var(--text-secondary);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        background: var(--bg-surface-muted);
+      }
+
+      tbody tr:hover {
+        background: var(--bg-hover);
+      }
+
+      .col-check {
+        width: 44px;
+      }
+
+      .col-owner,
+      td.cell-owner {
+        width: 120px;
+      }
+
+      th.number,
+      td.number {
+        width: 128px;
+        padding-right: 34px;
+      }
+
+      .col-date,
+      td.cell-date {
+        width: 168px;
+        padding-right: 10px;
+      }
+
+      .col-action,
+      td.cell-action {
+        width: 92px;
+        padding-left: 8px;
+        padding-right: 20px;
+      }
+
+      .col-status,
+      .col-date,
+      .col-owner,
+      .col-action {
+        white-space: nowrap;
+      }
+
+      .col-check,
+      td.cell-check {
+        text-align: center;
+      }
+
+      .col-status,
+      td.cell-status,
+      .col-owner,
+      td.cell-owner,
+      .col-date,
+      td.cell-date {
+        text-align: left;
+      }
+
+      .col-action,
+      td.cell-action {
+        text-align: right;
+      }
+
+      .number {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .primary-cell {
+        display: grid;
+        gap: 4px;
+      }
+
+      .primary-title {
+        font-weight: 600;
+      }
+
+      .primary-meta {
+        color: var(--text-tertiary);
+        font-size: var(--font-size-12);
+      }
+
+      td.cell-status .badge,
+      td.cell-action .text-link {
+        justify-self: start;
+      }
+
+      td.cell-action .text-link {
+        display: inline-flex;
+      }
+
+      .tag,
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: var(--font-size-12);
+        font-weight: 600;
+        border: 1px solid transparent;
+        white-space: nowrap;
+      }
+
+      .tag-info,
+      .badge-info {
+        color: var(--info);
+        background: var(--info-soft);
+        border-color: rgba(21, 94, 239, 0.14);
+      }
+
+      .tag-success,
+      .badge-success {
+        color: var(--success);
+        background: var(--success-soft);
+        border-color: rgba(17, 122, 67, 0.14);
+      }
+
+      .tag-warning,
+      .badge-warning {
+        color: var(--warning);
+        background: var(--warning-soft);
+        border-color: rgba(178, 106, 0, 0.14);
+      }
+
+      .tag-danger,
+      .badge-danger {
+        color: var(--danger);
+        background: var(--danger-soft);
+        border-color: rgba(180, 35, 24, 0.14);
+      }
+
+      .text-link {
+        color: var(--brand-primary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+      }
+
+      .pagination {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .page-chip {
+        min-width: 36px;
+        height: 36px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        border: 1px solid var(--border-default);
+        background: #fff;
+        color: var(--text-secondary);
+        font-size: var(--font-size-13);
+      }
+
+      .page-chip.is-active {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: #fff;
+      }
+
+      .list-grid,
+      .token-grid,
+      .state-grid,
+      .card-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .list-grid,
+      .token-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .list-item {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .list-head,
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .list-meta,
+      .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .muted {
+        color: var(--text-secondary);
+        font-size: var(--font-size-13);
+        line-height: 1.6;
+      }
+
+      .list-actions,
+      .card-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 18px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .card-cover {
+        min-height: 136px;
+        border-radius: var(--radius-md);
+        background:
+          radial-gradient(circle at top right, rgba(49, 94, 251, 0.22), transparent 35%),
+          linear-gradient(135deg, #f3f6ff 0%, #eef2ff 100%);
+        border: 1px solid var(--border-default);
+      }
+
+      .state-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .state-card {
+        padding: 20px;
+        min-height: 220px;
+        display: grid;
+        gap: 14px;
+        grid-template-rows: auto auto 1fr auto;
+      }
+
+      .state-card .button,
+      .state-card .button-soft {
+        margin-top: auto;
+      }
+
+      .skeleton {
+        display: grid;
+        gap: 12px;
+      }
+
+      .skeleton-line {
+        height: 12px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #eff3fb 0%, #e5ebf8 50%, #eff3fb 100%);
+      }
+
+      .skeleton-line.wide {
+        width: 100%;
+      }
+
+      .skeleton-line.medium {
+        width: 74%;
+      }
+
+      .skeleton-line.short {
+        width: 46%;
+      }
+
+      .state-illustration {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        color: var(--brand-primary);
+        background: var(--brand-primary-soft);
+      }
+
+      .token-card {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .token-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .swatch {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .token-label {
+        display: grid;
+        gap: 4px;
+      }
+
+      .token-name {
+        font-weight: 600;
+      }
+
+      .token-value {
+        color: var(--text-tertiary);
+        font-size: var(--font-size-12);
+      }
+
+      @media (max-width: 1120px) {
+        .list-grid,
+        .token-grid,
+        .card-grid,
+        .state-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .page {
+          padding: 24px 16px 48px;
+        }
+
+        .toolbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .toolbar-group {
+          width: 100%;
+        }
+
+        .input,
+        .select,
+        .button,
+        .button-soft {
+          width: 100%;
+        }
+
+        .panel {
+          overflow-x: auto;
+        }
+
+        table {
+          min-width: 760px;
+        }
+
+        .table-footer,
+        .section-header,
+        .panel-head,
+        .list-head,
+        .card-head {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="toolbar">
+        <div class="toolbar-group">
+          <input class="input" value="搜索书名、作者、ID" />
+          <select class="select">
+            <option>全部状态</option>
+          </select>
+          <select class="select">
+            <option>全部渠道</option>
+          </select>
+          <select class="select">
+            <option>最近 30 天</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <button class="button-soft">导出</button>
+          <button class="button-soft">密度: Comfortable</button>
+          <button class="button">新建任务</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <h2>Table / 表格</h2>
+            <p class="section-subtitle">结构化数据、横向比较、批量处理 / Structured data, comparison, bulk processing</p>
+          </div>
+          <div class="batch-bar">已选 3 项 · 批量审核 · 批量归档</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>内容审核任务</h3>
+              <p class="section-subtitle">主信息列、状态列、时间列、操作列保持稳定对齐</p>
+            </div>
+            <a class="text-link" href="#">列设置</a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" checked /></th>
+                <th>内容</th>
+                <th class="col-status">状态</th>
+                <th class="col-owner">负责人</th>
+                <th class="number">曝光</th>
+                <th class="col-date">更新时间</th>
+                <th class="col-action">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cell-check"><input type="checkbox" checked /></td>
+                <td>
+                  <div class="primary-cell">
+                    <span class="primary-title">The Frozen Throne</span>
+                    <span class="primary-meta">Book ID 49012 · Fantasy · EN Market</span>
+                  </div>
+                </td>
+                <td class="cell-status"><span class="badge badge-warning">待复审</span></td>
+                <td class="cell-owner">Vanto</td>
+                <td class="number">128,430</td>
+                <td class="cell-date">2026-04-15 21:30</td>
+                <td class="cell-action"><a class="text-link" href="#">查看</a></td>
+              </tr>
+              <tr>
+                <td class="cell-check"><input type="checkbox" checked /></td>
+                <td>
+                  <div class="primary-cell">
+                    <span class="primary-title">Moon Over Seoul</span>
+                    <span class="primary-meta">Book ID 58210 · Romance · KR Market</span>
+                  </div>
+                </td>
+                <td class="cell-status"><span class="badge badge-success">已上线</span></td>
+                <td class="cell-owner">Nicole</td>
+                <td class="number">342,118</td>
+                <td class="cell-date">2026-04-15 18:12</td>
+                <td class="cell-action"><a class="text-link" href="#">详情</a></td>
+              </tr>
+              <tr>
+                <td class="cell-check"><input type="checkbox" checked /></td>
+                <td>
+                  <div class="primary-cell">
+                    <span class="primary-title">Last Signal</span>
+                    <span class="primary-meta">Book ID 60134 · Sci-Fi · US Market</span>
+                  </div>
+                </td>
+                <td class="cell-status"><span class="badge badge-info">处理中</span></td>
+                <td class="cell-owner">Angela</td>
+                <td class="number">92,044</td>
+                <td class="cell-date">2026-04-15 10:02</td>
+                <td class="cell-action"><a class="text-link" href="#">催办</a></td>
+              </tr>
+              <tr>
+                <td class="cell-check"><input type="checkbox" /></td>
+                <td>
+                  <div class="primary-cell">
+                    <span class="primary-title">A Silent Orchard</span>
+                    <span class="primary-meta">Book ID 60388 · Literary · Global</span>
+                  </div>
+                </td>
+                <td class="cell-status"><span class="badge badge-danger">已驳回</span></td>
+                <td class="cell-owner">-</td>
+                <td class="number">15,240</td>
+                <td class="cell-date">2026-04-14 09:42</td>
+                <td class="cell-action"><a class="text-link" href="#">复核</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <span class="muted">共 128 条记录</span>
+            <div class="pagination">
+              <span class="page-chip">1</span>
+              <span class="page-chip is-active">2</span>
+              <span class="page-chip">3</span>
+              <span class="page-chip">4</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <h2>List / 列表</h2>
+            <p class="section-subtitle">适合元信息较多、摘要较长、进入详情为主的场景 / Best for richer metadata, longer summaries, and detail-entry flows</p>
+          </div>
+        </div>
+        <div class="list-grid">
+          <article class="list-item">
+            <div class="list-head">
+              <div>
+                <h3>活动审核规则更新</h3>
+                <p class="muted">新增 Banner 资源尺寸校验、活动结束自动归档与撤回逻辑。</p>
+              </div>
+              <span class="tag tag-info">待确认</span>
+            </div>
+            <div class="list-meta">
+              <span class="tag tag-success">高优先级</span>
+              <span class="tag tag-info">运营规范</span>
+              <span class="tag tag-warning">需评审</span>
+            </div>
+            <p class="muted">负责人：Mina · 更新时间：2026-04-15 20:14 · 影响范围：Banner、活动页、消息中心</p>
+            <div class="list-actions">
+              <a class="text-link" href="#">查看详情</a>
+              <a class="text-link" href="#">评论</a>
+            </div>
+          </article>
+
+          <article class="list-item">
+            <div class="list-head">
+              <div>
+                <h3>作者激励策略回顾</h3>
+                <p class="muted">重点复盘签约前后漏斗变化、任务完成率与额外 Bonus 触达质量。</p>
+              </div>
+              <span class="tag tag-success">已发布</span>
+            </div>
+            <div class="list-meta">
+              <span class="tag tag-info">数据分析</span>
+              <span class="tag tag-success">周报</span>
+            </div>
+            <p class="muted">负责人：Leo · 更新时间：2026-04-14 17:40 · 覆盖市场：US / PH / ID</p>
+            <div class="list-actions">
+              <a class="text-link" href="#">打开文档</a>
+              <a class="text-link" href="#">同步结论</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <h2>Card List / 卡片列表</h2>
+            <p class="section-subtitle">适合内容库、素材库、模板库等浏览型数据场景 / Best for browsing-oriented libraries and asset collections</p>
+          </div>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <div class="card-cover"></div>
+            <div class="card-head">
+              <div>
+                <h3>Spring Campaign Hero Banner</h3>
+                <p class="muted">适合产品主页、活动专题与资源推荐位</p>
+              </div>
+              <span class="tag tag-success">可投放</span>
+            </div>
+            <div class="card-meta">
+              <span class="tag tag-info">1080 x 1440</span>
+              <span class="tag tag-info">EN</span>
+              <span class="tag tag-warning">需文案复核</span>
+            </div>
+            <div class="card-actions">
+              <a class="text-link" href="#">预览</a>
+              <a class="text-link" href="#">使用</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-cover"></div>
+            <div class="card-head">
+              <div>
+                <h3>Workspace Empty State Set</h3>
+                <p class="muted">适合资源平台与工具后台的空状态插画与提示组合</p>
+              </div>
+              <span class="tag tag-info">草稿</span>
+            </div>
+            <div class="card-meta">
+              <span class="tag tag-info">UI Kit</span>
+              <span class="tag tag-info">Mobile</span>
+            </div>
+            <div class="card-actions">
+              <a class="text-link" href="#">查看</a>
+              <a class="text-link" href="#">评论</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-cover"></div>
+            <div class="card-head">
+              <div>
+                <h3>Analytics Dashboard Card Module</h3>
+                <p class="muted">适合趋势分析、状态跟踪与数据概览的卡片模块</p>
+              </div>
+              <span class="tag tag-danger">待解决</span>
+            </div>
+            <div class="card-meta">
+              <span class="tag tag-info">Data Widget</span>
+              <span class="tag tag-warning">缺移动端稿</span>
+            </div>
+            <div class="card-actions">
+              <a class="text-link" href="#">修复</a>
+              <a class="text-link" href="#">历史版本</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <h2>State Modules / 状态模块</h2>
+            <p class="section-subtitle">明确区分 loading、empty、no result、error / Keep loading, empty, no result, and error distinct</p>
+          </div>
+        </div>
+        <div class="state-grid">
+          <article class="state-card">
+            <div class="state-illustration">L</div>
+            <div>
+              <h3>Loading</h3>
+              <p class="muted">保留真实布局结构，不只放一个转圈。</p>
+            </div>
+            <div class="skeleton">
+              <div class="skeleton-line wide"></div>
+              <div class="skeleton-line medium"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+          </article>
+
+          <article class="state-card">
+            <div class="state-illustration">E</div>
+            <div>
+              <h3>Empty</h3>
+              <p class="muted">当前还没有任何模板，先创建第一个资源集合。</p>
+            </div>
+            <button class="button">创建模板</button>
+          </article>
+
+          <article class="state-card">
+            <div class="state-illustration">N</div>
+            <div>
+              <h3>No Result</h3>
+              <p class="muted">未找到符合“PH 市场 + 已上线 + 最近 7 天”的结果。</p>
+            </div>
+            <button class="button-soft">清空筛选</button>
+          </article>
+
+          <article class="state-card">
+            <div class="state-illustration">R</div>
+            <div>
+              <h3>Error</h3>
+              <p class="muted">数据加载失败，请检查网络权限或稍后重试。</p>
+            </div>
+            <button class="button-soft">重新加载</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <h2>Token Layer / Token 层</h2>
+            <p class="section-subtitle">结构不变，仅通过 token 替换品牌壳 / Keep structure fixed and swap only the token shell</p>
+          </div>
+        </div>
+        <div class="token-grid">
+          <article class="token-card">
+            <div class="token-row">
+              <div class="token-label">
+                <span class="token-name">Brand Primary</span>
+                <span class="token-value">#315efb</span>
+              </div>
+              <span class="swatch" style="background:#315efb;"></span>
+            </div>
+            <div class="token-row">
+              <div class="token-label">
+                <span class="token-name">Surface</span>
+                <span class="token-value">#ffffff</span>
+              </div>
+              <span class="swatch" style="background:#ffffff;"></span>
+            </div>
+            <div class="token-row">
+              <div class="token-label">
+                <span class="token-name">Border</span>
+                <span class="token-value">#d9e0ef</span>
+              </div>
+              <span class="swatch" style="background:#d9e0ef;"></span>
+            </div>
+          </article>
+
+          <article class="token-card">
+            <div class="token-row">
+              <div class="token-label">
+                <span class="token-name">Success</span>
+                <span class="token-value">#117a43</span>
+              </div>
+              <span class="swatch" style="background:#117a43;"></span>
+            </div>
+            <div class="token-row">
+              <div class="token-label">
+                <span class="token-name">Warning</span>
+                <span class="token-value">#b26a00</span>
+              </div>
+              <span class="swatch" style="background:#b26a00;"></span>
+            </div>
+            <div class="token-row">
+              <div class="token-label">
+                <span class="token-name">Danger</span>
+                <span class="token-value">#b42318</span>
+              </div>
+              <span class="swatch" style="background:#b42318;"></span>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
